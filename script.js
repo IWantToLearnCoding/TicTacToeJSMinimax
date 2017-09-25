@@ -21,21 +21,55 @@ function startGame() {
     originalBoard = Array.from(Array(9).keys());
 
     for(var i = 0; i < cells.length; i++) {
-        cells[i].innertext = '';
+        cells[i].innerText = '';
         cells[i].style.removeProperty('background-color');
         cells[i].addEventListener('click', turnClick, false);
     }
 }
 
 function turnClick(e) {
-    turn(e.target.id, humanPlayer);
+    if(typeof originalBoard[e.target.id] === 'number') {
+        turn(e.target.id, humanPlayer);
+        if (!checkTie()) {
+            turn(bestSpot(), aiPlayer);
+        } else {
+            declareWinner('Tie Game');
+        }
+    }
+}
+
+function bestSpot() {
+    return emptySquares()[0];
+}
+
+function emptySquares() {
+    return originalBoard.filter(s => typeof s === 'number');
+}
+
+function declareWinner(who) {
+    document.querySelector('.endgame').style.display = 'block';
+    document.querySelector('.endgame .text').innerText = who;
+}
+
+function checkTie() {
+    if(emptySquares().length === 0) {
+        for (var i = 0; i < cells.length; i++) {
+            cells[i].style.backgroundColor = 'green';
+            cells[i].removeEventListener('click', turnClick, false);
+        }
+        return true;
+    }
+    return false;
 }
 
 function turn(squareId, player) {
-    originalBoard[squareId] = player;
-    document.getElementById(squareId).innerText = player;
-    let gameWon = checkWin(originalBoard, player);
-    if (gameWon) gameOver(gameWon);
+    originalBoard[squareId] = player; // set state of originalBoard
+    document.getElementById(squareId).innerText = player; // update board template
+    let gameWon = checkWin(originalBoard, player); // check if anyone won the game
+    if (gameWon) { // if gameWon, do formalities for game over and declare winner
+        gameOver(gameWon);
+        declareWinner(gameWon.player === humanPlayer ? 'You Win!' : 'You Loose');
+    }
 }
 
 function checkWin(board, player) {
@@ -44,10 +78,7 @@ function checkWin(board, player) {
     let gameWon = null;
     for(let [index, win] of winningCombs.entries()) {
         if (win.every(element => plays.indexOf(element) > -1)){
-            gameWon = {
-                index: index,
-                player: player
-            };
+            gameWon = { index, player };
             break;
         }
     }

@@ -1,0 +1,17 @@
+# ignore dependencies
+node_modules/
+
+# ignore bower dependencies
+bower_components/
+
+# ignore npm cache directory
+.npm
+
+# build bundle
+app.bundle.js
+
+#log
+npm-debug.log
+
+# hidden files
+.DS_Store
