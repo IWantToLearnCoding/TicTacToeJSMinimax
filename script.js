@@ -30,7 +30,7 @@ function startGame() {
 function turnClick(e) {
     if(typeof originalBoard[e.target.id] === 'number') {
         turn(e.target.id, humanPlayer);
-        if (!checkTie()) {
+        if (!checkWin(originalBoard, humanPlayer) && !checkTie()) {
             turn(bestSpot(), aiPlayer);
         } else {
             declareWinner('Tie Game');
@@ -39,8 +39,60 @@ function turnClick(e) {
 }
 
 function bestSpot() {
-    return emptySquares()[0];
+    return minimax(originalBoard, aiPlayer).index;
 }
+
+function minimax(currentBoard, player) {
+
+    var availableSpots = emptySquares();
+    // terminal conditions
+    if(checkWin(currentBoard, humanPlayer)) {
+        return {score: -10};
+    } else if(checkWin(currentBoard, aiPlayer)) {
+        return {score: 10};
+    } else if(availableSpots.length === 0){
+        return {score: 0};
+    }
+    // recursive part of the algorithm
+    var moves = [];
+    availableSpots.forEach(function (spot, index) {
+        var move = {};
+        move.index = spot;
+        currentBoard[spot] = player;
+
+        if(player === aiPlayer) {
+            move.score = minimax(currentBoard, humanPlayer).score;
+        } else {
+            move.score = minimax(currentBoard, aiPlayer).score;
+        }
+
+        currentBoard[spot] = spot;
+        moves.push(move);
+    });
+
+    //finding the best score
+    var bestMove;
+    if(player === aiPlayer) {
+        var bestScore = -10000 // aiPlayer is maximizing
+        moves.forEach(function(move, index) {
+            if(move.score > bestScore) {
+                bestScore = move.score;
+                bestMove = index;
+            }
+        })
+    } else {
+        var bestScore = 10000 // humanPlayer is minizing
+        moves.forEach(function(move, index) {
+            if(move.score < bestScore) {
+                bestScore = move.score;
+                bestMove = index;
+            }
+        })
+    }
+
+    return moves[bestMove];
+}
+
 
 function emptySquares() {
     return originalBoard.filter(s => typeof s === 'number');

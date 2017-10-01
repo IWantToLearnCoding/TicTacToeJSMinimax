@@ -1,7 +1,7 @@
 # TicTacToeGame
 
-1. Basic TicTacToe Game
-2. Unbeatable TicTacToe Game using minmax algorithm
+1. Basic TicTacToe Game (branch - master)
+2. Unbeatable TicTacToe Game using minmax algorithm (branch - minimaxTicTacToe)
 
 # Resources
 Learn from freecodecamp.org
